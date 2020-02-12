@@ -1,4 +1,4 @@
-import { observers } from './data';
+import { observers, data } from './data';
 
 export class Observer {
   id: string;
@@ -12,5 +12,6 @@ export class Observer {
 
   unsubscribe() {
     delete observers[this.id];
+    delete data[this.key];
   }
 }
