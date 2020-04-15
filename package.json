@@ -1,11 +1,12 @@
 {
   "name": "le5le-store",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "A global store and subcribe data for JavaScript apps.",
   "main": "index.js",
   "scripts": {
     "copy": "copyfiles  package.json dist",
-    "build": "tsc && npm run copy"
+    "build": "tsc && npm run copy",
+    "test": "karma start"
   },
   "keywords": [
     "store",
@@ -23,8 +24,14 @@
   },
   "homepage": "https://github.com/Alsmile/topology#readme",
   "devDependencies": {
-    "typescript": "~3.4.3",
     "copyfiles": "latest",
-    "karma": "~4.1.0"
+    "@types/jasmine": "^3.4.0",
+    "jasmine-core": "^3.3.0",
+    "karma": "^4.3.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-cli": "^2.0.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-typescript": "latest",
+    "typescript": "~3.4.3"
   }
 }

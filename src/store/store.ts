@@ -3,59 +3,94 @@ import { Observer } from './observer';
 import { s8 } from './uuid';
 
 export class Store {
-  static get(key?: string) {
-    if (!key && key === undefined) {
-      return data;
+  data: any = {};
+  observers: any = {};
+  constructor() { }
+
+  get(key?: string) {
+    return Store.get(key, this.data);
+  }
+
+  set(key: string, value: any) {
+    Store.set(key, value, this.data, this.observers);
+  }
+
+  updated(key: string) {
+    Store.updated(key, this.data, this.observers);
+  }
+
+  subscribe(key: string, fn: (data: any) => void) {
+    return Store.subscribe(key, fn, this.data, this.observers);
+  }
+
+  static get(key?: string, store?: any) {
+    if (!store) {
+      store = data;
+    }
+
+    if (key === undefined) {
+      return store;
     }
 
     const props = key.split('.');
-    let val = data;
     for (const prop of props) {
-      val = val[prop];
-      if (val === undefined) {
-        return undefined;
+      store = store[prop];
+      if (store === undefined) {
+        break;
       }
     }
 
-    return val;
+    return store;
   }
 
-  static set(key: string, value: any) {
+  static set(key: string, value: any, store?: any, obs?: any) {
+    if (!store) {
+      store = data;
+    }
+    if (!obs) {
+      obs = observers;
+    }
+
     const props = key.split('.');
-    let val = data;
+    let _store = store;
     for (let i = 0; i < props.length - 1; ++i) {
-      if (!val[props[i]]) {
-        val[props[i]] = {};
+      if (!_store[props[i]]) {
+        _store[props[i]] = {};
       }
-      val = val[props[i]];
+      _store = _store[props[i]];
     }
-    val[props[props.length - 1]] = value;
+    _store[props[props.length - 1]] = value;
 
-    // tslint:disable-next-line:forin
-    for (const id in observers) {
-      if (key === observers[id].key) {
-        observers[id].fn(value);
-      } else if (key.indexOf(observers[id].key) === 0) {
-        observers[id].fn(Store.get(observers[id].key));
+    for (const id in obs) {
+      if (key.indexOf(obs[id].key) === 0) {
+        obs[id].fn(Store.get(obs[id].key, store));
       }
     }
   }
 
-  static updated(key: string) {
-    for (const id in observers) {
-      if (key.indexOf(observers[id].key) === 0) {
-        observers[id].fn(Store.get(observers[id].key));
+  static updated(key: string, store?: any, obs?: any) {
+    if (!obs) {
+      obs = observers;
+    }
+
+    for (const id in obs) {
+      if (key.indexOf(obs[id].key) === 0) {
+        obs[id].fn(Store.get(obs[id].key, store));
       }
     }
   }
 
-  static subscribe(key: string, fn: (data: any) => void) {
+  static subscribe(key: string, fn: (data: any) => void, store?: any, obs?: any) {
+    if (!obs) {
+      obs = observers;
+    }
+
     const id = s8();
     const observer = new Observer(id, key, fn);
-    observers[id] = observer;
+    obs[id] = observer;
 
-    const value = Store.get(key);
-    if (value !== undefined && value !== null) {
+    const value = Store.get(key, store);
+    if (value !== undefined) {
       fn(value);
     }
 
