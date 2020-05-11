@@ -12,6 +12,5 @@ export class Observer {
 
   unsubscribe() {
     delete observers[this.id];
-    delete data[this.key];
   }
 }
