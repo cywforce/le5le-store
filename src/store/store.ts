@@ -89,7 +89,10 @@ export class Store {
     const observer = new Observer(id, key, fn);
     obs[id] = observer;
 
-    fn(Store.get(key, store));
+    const value = Store.get(key, store);
+    if (value !== undefined) {
+      fn(value);
+    }
 
     return observer;
   }
